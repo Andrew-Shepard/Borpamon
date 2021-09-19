@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Borpasaur
   description: 
-  frontSprite: {fileID: 21300000, guid: 0f37bf3cf5680a64d863b5f155b2a597, type: 3}
-  backSprite: {fileID: 21300000, guid: aacaae602a38f884ab9e02e43de3736d, type: 3}
+  frontSprite: {fileID: 21300000, guid: 3118a69de2f15e04ba75c559f1417454, type: 3}
+  backSprite: {fileID: 21300000, guid: a51a4351c44eef74c8166768ea4a9ead, type: 3}
   type1: 4
   type2: 8
   maxHp: 20
@@ -27,3 +27,5 @@ MonoBehaviour:
   learnableMoves:
   - moveBase: {fileID: 11400000, guid: 53ed95298c2ce33478e05f43d67f51d4, type: 2}
     level: 1
+  - moveBase: {fileID: 11400000, guid: c7d91f7662027f9408dfa9893e98e20c, type: 2}
+    level: 3
