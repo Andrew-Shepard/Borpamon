@@ -14,8 +14,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Borpamander
   description: Fire slug
-  frontSprite: {fileID: 21300000, guid: cd259d9d4f8ba2749a16d1cc64d46bec, type: 3}
-  backSprite: {fileID: 21300000, guid: ed8e1d9976a1fd94d961840d8f6e7764, type: 3}
+  frontSprite: {fileID: 21300000, guid: 260a0ef1a2bd7fc43be569833ca45da4, type: 3}
+  backSprite: {fileID: 21300000, guid: 6937f2b4af7a33b4989923b3dd5ed2c3, type: 3}
   type1: 2
   type2: 0
   maxHp: 20
@@ -29,3 +29,5 @@ MonoBehaviour:
     level: 1
   - moveBase: {fileID: 11400000, guid: c7d91f7662027f9408dfa9893e98e20c, type: 2}
     level: 3
+  - moveBase: {fileID: 11400000, guid: d860dc8b9c8ed4e429cefed9b8bb7b35, type: 2}
+    level: 10
