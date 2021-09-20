@@ -1,13 +1,16 @@
 using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 
-public class PlayerMovement : MonoBehaviour
+public class PlayerController : MonoBehaviour
 {
     public float moveSpeed;
     public LayerMask solidObjectsLayer;
     public LayerMask grassLayer;
+
+    public event Action OnEncontered;
 
     private bool isMoving;
     private Vector2 input;
@@ -19,7 +22,7 @@ public class PlayerMovement : MonoBehaviour
         animator = GetComponent<Animator>();
     }
 
-    private void Update()
+    public void HandleUpdate()
     {
         if (!isMoving)
         {
@@ -77,9 +80,10 @@ public class PlayerMovement : MonoBehaviour
     {
         if (Physics2D.OverlapCircle(transform.position, 0.2f, grassLayer) != null)
         {
-            if (Random.Range(1, 101) <= 10)
+            if (UnityEngine.Random.Range(1, 101) <= 10)
             {
-                Debug.Log("Borpa time");
+                animator.SetBool("isMoving", false);
+                OnEncontered();
             }
         }
     }

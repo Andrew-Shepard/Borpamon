@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,11 +8,11 @@ public class BattleSystem : MonoBehaviour
 {
     [SerializeField] BattleUnit playerUnit;
     [SerializeField] BattleHud playerHud;
-
     [SerializeField] BattleUnit enemyUnit;
     [SerializeField] BattleHud enemyHud;
-
     [SerializeField] BattleDialogBox dialogBox;
+
+    public event Action<bool> OnBattleOver;
 
     BattleState state;
     int currentAction;
@@ -19,7 +20,7 @@ public class BattleSystem : MonoBehaviour
 
     private IEnumerator coroutine;
 
-    private void Start()
+    public void StartBattle()
     {
         StartCoroutine(SetupBattle());
     }
@@ -65,8 +66,12 @@ public class BattleSystem : MonoBehaviour
         var move = playerUnit.Borpamon.Moves[currentMove];
 
         yield return dialogBox.TypeDialog($"{playerUnit.Borpamon.Borpamon_base.Name} used {move.Base.Name}!");
-
         yield return new WaitForSeconds(1f);
+
+        playerUnit.PlayAttackAnimation();
+        yield return new WaitForSeconds(1f);
+
+        enemyUnit.PlayHitAnimation();
 
         DamageDetails damageDetails = enemyUnit.Borpamon.TakeDamage(move, playerUnit.Borpamon);
         yield return enemyHud.UpdateHP();
@@ -75,6 +80,10 @@ public class BattleSystem : MonoBehaviour
         if (damageDetails.Fainted)
         {
             yield return dialogBox.TypeDialog($"Enemy {enemyUnit.Borpamon.Borpamon_base.Name} Fainted.");
+            enemyUnit.PlayFaintAnimation();
+
+            yield return new WaitForSeconds(2f);
+            OnBattleOver(true);
         }
         else
         {
@@ -87,10 +96,14 @@ public class BattleSystem : MonoBehaviour
         state = BattleState.EnemyMove;
 
         var move = enemyUnit.Borpamon.GetRandomMove();
-
+        
         yield return dialogBox.TypeDialog($"{enemyUnit.Borpamon.Borpamon_base.Name} used {move.Base.Name}!");
-
         yield return new WaitForSeconds(1f);
+
+        enemyUnit.PlayAttackAnimation();
+        yield return new WaitForSeconds(1f);
+
+        playerUnit.PlayHitAnimation();
 
         DamageDetails damageDetails = playerUnit.Borpamon.TakeDamage(move, enemyUnit.Borpamon);
         yield return playerHud.UpdateHP();
@@ -99,6 +112,10 @@ public class BattleSystem : MonoBehaviour
         if (damageDetails.Fainted)
         {
             yield return dialogBox.TypeDialog($"{playerUnit.Borpamon.Borpamon_base.Name} Fainted.");
+            playerUnit.PlayFaintAnimation();
+
+            yield return new WaitForSeconds(2f);
+            OnBattleOver(false);
         }
         else
         {
@@ -189,7 +206,7 @@ public class BattleSystem : MonoBehaviour
             StartCoroutine(PerformPlayerMove());
         }
     }
-    private void Update()
+    public void HandleUpdate()
     {
         if(state == BattleState.PlayerAction)
         {
