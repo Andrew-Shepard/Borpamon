@@ -51,9 +51,27 @@ public class Borpamon
         get { return Mathf.FloorToInt((Borpamon_base.Speed * Level) / 100f) + 5; }
     }
     
-    public bool TakeDamage(Move move, Borpamon attacker)
+    public DamageDetails TakeDamage(Move move, Borpamon attacker)
     {
-        float modifiers = Random.Range(0.85f, 1f);
+        float critical = 1f;
+        if (Random.value * 100f <= 6.25f) //Critical hits have a 6.25 chance to occur
+            critical = 1.5f;
+
+
+        float type = TypeChart.GetEffectiveness(move.Base.Type, this.Borpamon_base.Type1) 
+            * TypeChart.GetEffectiveness(move.Base.Type, this.Borpamon_base.Type2);
+
+        Debug.Log("" + move.Base.Type.ToString() +" , "+ this.Borpamon_base.Type1.ToString()) ;
+        
+
+        var damageDetails = new DamageDetails()
+        {
+            TypeEffectiveness = type,
+            Critical = critical,
+            Fainted = false
+        };
+        
+        float modifiers = Random.Range(0.85f, 1f) * type * critical;
         float a = (2 * attacker.Level + 10) / 250f;
 
         float d = a * move.Base.Power * ((float)attacker.Attack / Defense);
@@ -63,10 +81,10 @@ public class Borpamon
         if (HP <= 0)
         {
             HP = 0;
-            return true;
+            damageDetails.Fainted = true;
         }
 
-        return false;
+        return damageDetails;
     }
 
     public Move GetRandomMove()
@@ -74,4 +92,11 @@ public class Borpamon
         int r = Random.Range(0, Moves.Count);
         return Moves[r];
     }
+}
+
+public class DamageDetails
+{
+    public bool Fainted { get; set; }
+    public float Critical { get; set; }
+    public float TypeEffectiveness { get; set; }
 }

@@ -68,10 +68,11 @@ public class BattleSystem : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
-        bool isFainted = enemyUnit.Borpamon.TakeDamage(move, playerUnit.Borpamon);
+        DamageDetails damageDetails = enemyUnit.Borpamon.TakeDamage(move, playerUnit.Borpamon);
         yield return enemyHud.UpdateHP();
+        yield return ShowDamageDetails(damageDetails);
 
-        if (isFainted)
+        if (damageDetails.Fainted)
         {
             yield return dialogBox.TypeDialog($"Enemy {enemyUnit.Borpamon.Borpamon_base.Name} Fainted.");
         }
@@ -91,15 +92,37 @@ public class BattleSystem : MonoBehaviour
 
         yield return new WaitForSeconds(1f);
 
-        bool isFainted = playerUnit.Borpamon.TakeDamage(move, enemyUnit.Borpamon);
+        DamageDetails damageDetails = playerUnit.Borpamon.TakeDamage(move, enemyUnit.Borpamon);
         yield return playerHud.UpdateHP();
-        if (isFainted)
+        yield return ShowDamageDetails(damageDetails);
+
+        if (damageDetails.Fainted)
         {
             yield return dialogBox.TypeDialog($"{playerUnit.Borpamon.Borpamon_base.Name} Fainted.");
         }
         else
         {
             PlayerAction();
+        }
+    }
+
+    IEnumerator ShowDamageDetails(DamageDetails damageDetails)
+    {
+        if (damageDetails.Critical > 1f)
+        {
+            yield return dialogBox.TypeDialog("A critical hit!");
+            yield return new WaitForSeconds(1f);
+        }
+        
+        if (damageDetails.TypeEffectiveness > 1f)
+        {
+            yield return dialogBox.TypeDialog("It's super effective!");
+            yield return new WaitForSeconds(1f);
+        } 
+        else if (damageDetails.TypeEffectiveness < 1f)
+        {
+            yield return dialogBox.TypeDialog("It's not very effective.");
+            yield return new WaitForSeconds(1f);
         }
     }
     void HandleActionSelection()
