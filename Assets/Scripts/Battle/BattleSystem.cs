@@ -25,6 +25,7 @@ public class BattleSystem : MonoBehaviour
         StartCoroutine(SetupBattle());
     }
 
+    
     public IEnumerator SetupBattle()
     {
         playerUnit.Setup();

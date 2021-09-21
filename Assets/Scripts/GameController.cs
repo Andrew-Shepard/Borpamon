@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public enum GameState { FreeRoam, Battle }
 
@@ -14,16 +15,16 @@ public class GameController : MonoBehaviour
 
     private void Start()
     {
-        playerController.OnEncontered += StartBattle;
+        playerController.OnEncountered += FreeRoamtoBattleAnimation; //player controller subscribes to the event on encountered then
+        //starts the function startbattle
         battleSystem.OnBattleOver += EndBattle;
     }
 
     void StartBattle()
     {
-        gameState = GameState.Battle;
+        //gameState = GameState.Battle; called in freeroamtobattleanimation
         battleSystem.gameObject.SetActive(true);
         worldCamera.gameObject.SetActive(false);
-
         battleSystem.StartBattle();
     }
 
@@ -33,8 +34,19 @@ public class GameController : MonoBehaviour
         battleSystem.gameObject.SetActive(false);
         worldCamera.gameObject.SetActive(true);
     }
+    
+    private void FreeRoamtoBattleAnimation()
+    {
+        var sequence = DOTween.Sequence();
+        //Previous issue where OnComplete called startbattle twice, I think it was from the shake position reaching its
+        //starting point twice during the animation. changing the fade to false seems to have fixed.
+        gameState = GameState.Battle;
 
-    private void Update()
+        
+        sequence.Append(worldCamera.DOShakePosition(1f, new Vector3(.2f,0,0), 10, 10, false)).OnComplete(this.StartBattle);
+    }
+
+    private void Update() // controls the player inputs
     {
         if (gameState == GameState.FreeRoam)
         {

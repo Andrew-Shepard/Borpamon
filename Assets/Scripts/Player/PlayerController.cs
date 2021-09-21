@@ -2,7 +2,7 @@ using System.Collections;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
-
+using DG.Tweening;
 
 public class PlayerController : MonoBehaviour
 {
@@ -10,12 +10,13 @@ public class PlayerController : MonoBehaviour
     public LayerMask solidObjectsLayer;
     public LayerMask grassLayer;
 
-    public event Action OnEncontered;
+    public event Action OnEncountered;
 
     private bool isMoving;
     private Vector2 input;
 
     private Animator animator;
+
 
     private void Awake()
     {
@@ -35,7 +36,7 @@ public class PlayerController : MonoBehaviour
             }
 
             if (input != Vector2.zero)
-            {   
+            {
                 animator.SetFloat("moveX", input.x);
                 animator.SetFloat("moveY", input.y);
 
@@ -56,7 +57,7 @@ public class PlayerController : MonoBehaviour
     {
         isMoving = true;
 
-        while((targetPos-transform.position).sqrMagnitude > Mathf.Epsilon)
+        while ((targetPos - transform.position).sqrMagnitude > Mathf.Epsilon)
         {
             transform.position = Vector3.MoveTowards(transform.position, targetPos, moveSpeed * Time.deltaTime);
             yield return null;
@@ -80,14 +81,13 @@ public class PlayerController : MonoBehaviour
     {
         if (Physics2D.OverlapCircle(transform.position, 0.1f, grassLayer) != null)
         {
-
+            //https://medium.com/@allencoded/unity-tilemaps-and-storing-individual-tile-data-8b95d87e9f32 walk grass anim
             if (UnityEngine.Random.Range(1, 101) <= 10)
             {
                 animator.SetBool("isMoving", false);
-                OnEncontered();
+                OnEncountered(); 
             }
         }
     }
-
-
 }
+    
