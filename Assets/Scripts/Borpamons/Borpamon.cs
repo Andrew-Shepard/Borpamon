@@ -59,10 +59,7 @@ public class Borpamon
 
 
         float type = TypeChart.GetEffectiveness(move.Base.Type, this.Borpamon_base.Type1) 
-            * TypeChart.GetEffectiveness(move.Base.Type, this.Borpamon_base.Type2);
-
-        Debug.Log("" + move.Base.Type.ToString() +" , "+ this.Borpamon_base.Type1.ToString()) ;
-        
+            * TypeChart.GetEffectiveness(move.Base.Type, this.Borpamon_base.Type2);   
 
         var damageDetails = new DamageDetails()
         {
@@ -70,11 +67,14 @@ public class Borpamon
             Critical = critical,
             Fainted = false
         };
-        
+
+        float attack = (move.Base.IsSpecial) ? attacker.SpAttack : attacker.Attack;
+        float defense = (move.Base.IsSpecial) ? attacker.SpDefense : attacker.Defense;
+
         float modifiers = Random.Range(0.85f, 1f) * type * critical;
         float a = (2 * attacker.Level + 10) / 250f;
 
-        float d = a * move.Base.Power * ((float)attacker.Attack / Defense);
+        float d = a * move.Base.Power * ((float)attack / defense);
         int damage = Mathf.FloorToInt(d * modifiers);
 
         HP -= damage;

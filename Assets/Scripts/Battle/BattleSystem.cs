@@ -64,6 +64,7 @@ public class BattleSystem : MonoBehaviour
         state = BattleState.Busy;
 
         var move = playerUnit.Borpamon.Moves[currentMove];
+        --move.Pp;
 
         yield return dialogBox.TypeDialog($"{playerUnit.Borpamon.Borpamon_base.Name} used {move.Base.Name}!");
         yield return new WaitForSeconds(1f);
@@ -96,7 +97,8 @@ public class BattleSystem : MonoBehaviour
         state = BattleState.EnemyMove;
 
         var move = enemyUnit.Borpamon.GetRandomMove();
-        
+        --move.Pp;
+
         yield return dialogBox.TypeDialog($"{enemyUnit.Borpamon.Borpamon_base.Name} used {move.Base.Name}!");
         yield return new WaitForSeconds(1f);
 

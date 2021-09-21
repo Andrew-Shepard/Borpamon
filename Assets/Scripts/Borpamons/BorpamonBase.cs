@@ -151,8 +151,8 @@ public class TypeChart
         {
             return 1;
         }
-        int row = (int) attackType - 1; Debug.Log($"{row}");
-        int col = (int) defenseType - 1; Debug.Log($"{col}");
+        int row = (int) attackType - 1;
+        int col = (int) defenseType - 1;
 
         return chart[row][col];
     }

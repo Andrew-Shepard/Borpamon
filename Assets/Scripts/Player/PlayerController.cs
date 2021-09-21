@@ -78,8 +78,9 @@ public class PlayerController : MonoBehaviour
 
     private void CheckForEncounters()
     {
-        if (Physics2D.OverlapCircle(transform.position, 0.2f, grassLayer) != null)
+        if (Physics2D.OverlapCircle(transform.position, 0.1f, grassLayer) != null)
         {
+
             if (UnityEngine.Random.Range(1, 101) <= 10)
             {
                 animator.SetBool("isMoving", false);
@@ -87,4 +88,6 @@ public class PlayerController : MonoBehaviour
             }
         }
     }
+
+
 }
