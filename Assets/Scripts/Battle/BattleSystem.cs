@@ -19,24 +19,27 @@ public class BattleSystem : MonoBehaviour
     int currentMove;
 
     private IEnumerator coroutine;
-
-    public void StartBattle()
+    BorpamonParty playerParty;
+    Borpamon wildBorpamon;
+    public void StartBattle(BorpamonParty playerParty, Borpamon wildBorpamon)
     {
+        this.playerParty = playerParty;
+        this.wildBorpamon = wildBorpamon;
         StartCoroutine(SetupBattle());
     }
 
-    
+   
     public IEnumerator SetupBattle()
     {
-        playerUnit.Setup();
-        enemyUnit.Setup();
+        playerUnit.Setup(playerParty.GetHealthyBorpamon());
+        enemyUnit.Setup(wildBorpamon);
         playerHud.SetData(playerUnit.Borpamon);
         enemyHud.SetData(enemyUnit.Borpamon);
 
         dialogBox.SetMoveNames(playerUnit.Borpamon.Moves);
 
         yield return
-            StartCoroutine( dialogBox.TypeDialog($"A wild {enemyUnit.Borpamon.Borpamon_base.Name} appeared!") );
+            StartCoroutine( dialogBox.TypeDialog($"A wild {enemyUnit.Borpamon.Base.Name} appeared!") );
         yield return new WaitForSeconds(1f);
 
         PlayerAction();
@@ -67,7 +70,7 @@ public class BattleSystem : MonoBehaviour
         var move = playerUnit.Borpamon.Moves[currentMove];
         --move.Pp;
 
-        yield return dialogBox.TypeDialog($"{playerUnit.Borpamon.Borpamon_base.Name} used {move.Base.Name}!");
+        yield return dialogBox.TypeDialog($"{playerUnit.Borpamon.Base.Name} used {move.Base.Name}!");
         yield return new WaitForSeconds(1f);
 
         playerUnit.PlayAttackAnimation();
@@ -81,11 +84,12 @@ public class BattleSystem : MonoBehaviour
 
         if (damageDetails.Fainted)
         {
-            yield return dialogBox.TypeDialog($"Enemy {enemyUnit.Borpamon.Borpamon_base.Name} Fainted.");
+            currentMove = 0; //Prevents user from accessing a move that doesnt exist
+            yield return dialogBox.TypeDialog($"Enemy {enemyUnit.Borpamon.Base.Name} Fainted.");
             enemyUnit.PlayFaintAnimation();
 
             yield return new WaitForSeconds(2f);
-            OnBattleOver(true);
+
         }
         else
         {
@@ -100,7 +104,7 @@ public class BattleSystem : MonoBehaviour
         var move = enemyUnit.Borpamon.GetRandomMove();
         --move.Pp;
 
-        yield return dialogBox.TypeDialog($"{enemyUnit.Borpamon.Borpamon_base.Name} used {move.Base.Name}!");
+        yield return dialogBox.TypeDialog($"{enemyUnit.Borpamon.Base.Name} used {move.Base.Name}!");
         yield return new WaitForSeconds(1f);
 
         enemyUnit.PlayAttackAnimation();
@@ -114,11 +118,27 @@ public class BattleSystem : MonoBehaviour
 
         if (damageDetails.Fainted)
         {
-            yield return dialogBox.TypeDialog($"{playerUnit.Borpamon.Borpamon_base.Name} Fainted.");
+            yield return dialogBox.TypeDialog($"{playerUnit.Borpamon.Base.Name} Fainted.");
             playerUnit.PlayFaintAnimation();
 
             yield return new WaitForSeconds(2f);
-            OnBattleOver(false);
+            var nextBorpamon = playerParty.GetHealthyBorpamon();
+            if (nextBorpamon != null)  // if there's a living pokemon in the party
+            {
+                playerUnit.Setup(nextBorpamon);
+                playerHud.SetData(nextBorpamon);
+
+                dialogBox.SetMoveNames(playerUnit.Borpamon.Moves);
+
+                yield return dialogBox.TypeDialog($"Go {nextBorpamon.Base.Name}!");
+                yield return new WaitForSeconds(1f);
+
+                PlayerAction();
+            }
+            else
+            {
+                OnBattleOver(false);
+            }
         }
         else
         {

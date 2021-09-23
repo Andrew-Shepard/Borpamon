@@ -1,23 +1,23 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+[System.Serializable]
 public class Borpamon
 {
-    public BorpamonBase Borpamon_base { get; set; }
-    public int Level { get; set; }
+    [SerializeField] BorpamonBase _base;
+    [SerializeField] int level;
+    public BorpamonBase Base { get { return _base; }  }
+    public int Level { get { return level; } }
     
     public int HP { get; set; }
     public List<Move> Moves { get; set; }
-    public Borpamon(BorpamonBase bBase, int bLevel)
+    public void Init() 
     {
-        Borpamon_base = bBase;
-        Level = bLevel;
         HP = MaxHp;
 
         //Generate Moves
         Moves = new List<Move>();
-        foreach (var move in Borpamon_base.LearnableMoves)
+        foreach (var move in _base.LearnableMoves)
         {
             if (move.Level <= Level)
                 Moves.Add(new Move(move.Base));
@@ -28,27 +28,27 @@ public class Borpamon
     }
     public int MaxHp
     {
-        get { return Mathf.FloorToInt((Borpamon_base.MaxHp * Level) / 100f) + 10; }
+        get { return Mathf.FloorToInt((_base.MaxHp * Level) / 100f) + 10; }
     }
     public int Attack
     {
-        get { return Mathf.FloorToInt((Borpamon_base.Attack * Level) / 100f) + 5; }
+        get { return Mathf.FloorToInt((_base.Attack * Level) / 100f) + 5; }
     }
     public int Defense
     {
-        get { return Mathf.FloorToInt((Borpamon_base.Defense * Level) / 100f) + 5; }
+        get { return Mathf.FloorToInt((_base.Defense * Level) / 100f) + 5; }
     }
     public int SpAttack
     {
-        get { return Mathf.FloorToInt((Borpamon_base.SpAttack * Level) / 100f) + 5; }
+        get { return Mathf.FloorToInt((_base.SpAttack * Level) / 100f) + 5; }
     }
     public int SpDefense
     {
-        get { return Mathf.FloorToInt((Borpamon_base.SpDefense * Level) / 100f) + 5; }
+        get { return Mathf.FloorToInt((_base.SpDefense * Level) / 100f) + 5; }
     }
     public int Speed
     {
-        get { return Mathf.FloorToInt((Borpamon_base.Speed * Level) / 100f) + 5; }
+        get { return Mathf.FloorToInt((_base.Speed * Level) / 100f) + 5; }
     }
     
     public DamageDetails TakeDamage(Move move, Borpamon attacker)
@@ -58,8 +58,8 @@ public class Borpamon
             critical = 1.5f;
 
 
-        float type = TypeChart.GetEffectiveness(move.Base.Type, this.Borpamon_base.Type1) 
-            * TypeChart.GetEffectiveness(move.Base.Type, this.Borpamon_base.Type2);   
+        float type = TypeChart.GetEffectiveness(move.Base.Type, this._base.Type1) 
+            * TypeChart.GetEffectiveness(move.Base.Type, this._base.Type2);   
 
         var damageDetails = new DamageDetails()
         {

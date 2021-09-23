@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5b375619925175b45bae05d25d8fc262, type: 3}
   m_Name: Murder
   m_EditorClassIdentifier: 
-  name: Fire fire kill kill
+  name: Fire Fire Kill
   description: should instant kill
   type: 2
   power: 1000
   accuracy: 100
   pp: 420
+  isSpecial: 0

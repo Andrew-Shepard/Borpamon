@@ -6909,8 +6909,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fb021298157d6e4bbb45dd1bd3262b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  borpamon_base: {fileID: 11400000, guid: f53e215c6987a5340ae51edf1afe3f3a, type: 2}
-  level: 5
   isPlayerUnit: 0
 --- !u!1 &864069586
 GameObject:
@@ -7233,8 +7231,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6fb021298157d6e4bbb45dd1bd3262b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  borpamon_base: {fileID: 11400000, guid: f3ca47477c9720643b72b3671fe68764, type: 2}
-  level: 10
   isPlayerUnit: 1
 --- !u!1 &1007825925
 GameObject:
@@ -7687,6 +7683,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1261374661}
   - component: {fileID: 1261374660}
+  - component: {fileID: 1261374662}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -7723,6 +7720,23 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1261374662
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1261374659}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cf0bf8f0fe16ba14da065bdb276504e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  wildBorpamons:
+  - _base: {fileID: 11400000, guid: f3ca47477c9720643b72b3671fe68764, type: 2}
+    level: 6
+  - _base: {fileID: 11400000, guid: f53e215c6987a5340ae51edf1afe3f3a, type: 2}
+    level: 100
 --- !u!1 &1269718546
 GameObject:
   m_ObjectHideFlags: 0
@@ -7987,6 +8001,7 @@ GameObject:
   - component: {fileID: 1371229115}
   - component: {fileID: 1371229114}
   - component: {fileID: 1371229117}
+  - component: {fileID: 1371229118}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -8098,6 +8113,23 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &1371229118
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1371229113}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bf2d5168fbb6d304490464e688a586da, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  borpamons:
+  - _base: {fileID: 11400000, guid: f53e215c6987a5340ae51edf1afe3f3a, type: 2}
+    level: 20
+  - _base: {fileID: 11400000, guid: f3ca47477c9720643b72b3671fe68764, type: 2}
+    level: 3
 --- !u!1 &1570871732
 GameObject:
   m_ObjectHideFlags: 0

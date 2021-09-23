@@ -25,7 +25,14 @@ public class GameController : MonoBehaviour
         //gameState = GameState.Battle; called in freeroamtobattleanimation
         battleSystem.gameObject.SetActive(true);
         worldCamera.gameObject.SetActive(false);
-        battleSystem.StartBattle();
+
+        var playerParty = playerController.GetComponent<BorpamonParty>();
+        //FindObjectOfType returns the object with map area and get component gets maparea
+        var wildBorpamon = FindObjectOfType<MapArea>()
+                                .GetComponent<MapArea>()
+                                       .GetRandomWildBorpamon();
+
+        battleSystem.StartBattle(playerParty,wildBorpamon);
     }
 
     void EndBattle(bool won)

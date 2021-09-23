@@ -14,7 +14,7 @@ public class BattleHud : MonoBehaviour
     {
         _borpamon = borpamon;
 
-        nameText.text = borpamon.Borpamon_base.Name;
+        nameText.text = borpamon.Base.Name;
         levelText.text = "Lvl " + borpamon.Level;
         hpBar.SetHP((float) borpamon.HP / borpamon.MaxHp);
     }

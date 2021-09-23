@@ -18,7 +18,7 @@ public class MoveBase : ScriptableObject
 
     public string Name
     {
-        get { return name; }
+        get { return base.name; }
     }
     public string Description
     {

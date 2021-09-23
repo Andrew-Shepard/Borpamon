@@ -6,8 +6,6 @@ using DG.Tweening;
 
 public class BattleUnit : MonoBehaviour // this class has the unit animations and image loading
 {
-    [SerializeField] BorpamonBase borpamon_base;
-    [SerializeField] int level;
     [SerializeField] bool isPlayerUnit;
 
     public Borpamon Borpamon { get; set; }
@@ -22,16 +20,16 @@ public class BattleUnit : MonoBehaviour // this class has the unit animations an
         originalPosition = image.transform.localPosition;
         originalColor = image.color;
     }
-    public void Setup()
+    public void Setup(Borpamon borpamon)
     {
-        Borpamon = new Borpamon(borpamon_base, level);
+        Borpamon = borpamon;
         if (isPlayerUnit)
         {
-            image.sprite = Borpamon.Borpamon_base.BackSprite;
+            image.sprite = Borpamon.Base.BackSprite;
         }
         else
         {
-            image.sprite = Borpamon.Borpamon_base.FrontSprite;
+            image.sprite = Borpamon.Base.FrontSprite;
         }
 
         image.color = originalColor;
@@ -53,9 +51,9 @@ public class BattleUnit : MonoBehaviour // this class has the unit animations an
         var sequence = DOTween.Sequence();
 
         if (isPlayerUnit) // May need to make transform amount relative to the image size.
-            sequence.Append(image.transform.DOLocalMoveX(originalPosition.x + 1000, .25f));
+            sequence.Append(image.transform.DOLocalMoveX(originalPosition.x + 500, .25f));
         else
-            sequence.Append(image.transform.DOLocalMoveX(originalPosition.x - 1000, .25f));
+            sequence.Append(image.transform.DOLocalMoveX(originalPosition.x - 500, .25f));
 
         image.transform.DOLocalMoveX(originalPosition.x, .25f);
     }
