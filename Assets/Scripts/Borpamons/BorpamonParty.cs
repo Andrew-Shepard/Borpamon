@@ -7,6 +7,13 @@ public class BorpamonParty : MonoBehaviour
 {
     [SerializeField] List<Borpamon> borpamons;
 
+    public List<Borpamon> Borpamons
+    {
+        get
+        {
+            return borpamons;
+        }
+    }
     private void Start()
     {
         foreach (var Borpamon in borpamons)

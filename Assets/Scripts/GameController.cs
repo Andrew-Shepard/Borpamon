@@ -10,6 +10,7 @@ public class GameController : MonoBehaviour
     [SerializeField] PlayerController playerController;
     [SerializeField] BattleSystem battleSystem;
     [SerializeField] Camera worldCamera;
+    
 
     GameState gameState;
 
@@ -48,8 +49,6 @@ public class GameController : MonoBehaviour
         //Previous issue where OnComplete called startbattle twice, I think it was from the shake position reaching its
         //starting point twice during the animation. changing the fade to false seems to have fixed.
         gameState = GameState.Battle;
-
-        
         sequence.Append(worldCamera.DOShakePosition(1f, new Vector3(.2f,0,0), 10, 10, false)).OnComplete(this.StartBattle);
     }
 
