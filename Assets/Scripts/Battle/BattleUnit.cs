@@ -7,8 +7,13 @@ using DG.Tweening;
 public class BattleUnit : MonoBehaviour // this class has the unit animations and image loading
 {
     [SerializeField] bool isPlayerUnit;
+    [SerializeField] BattleHud hud;
 
     public Borpamon Borpamon { get; set; }
+
+    public bool IsPlayerUnit { get; set; }
+
+    public BattleHud Hud { get { return hud; } }
 
     Image image;
     Vector3 originalPosition;
@@ -31,7 +36,7 @@ public class BattleUnit : MonoBehaviour // this class has the unit animations an
         {
             image.sprite = Borpamon.Base.FrontSprite;
         }
-
+        hud.SetData(Borpamon);
         image.color = originalColor;
         PlayEnterAnimation();
     }

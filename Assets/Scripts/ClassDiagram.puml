@@ -1,0 +1,151 @@
+﻿@startuml
+class BattleUnit{
+    bool isPlayerUnit
+	Image image
+    Vector3 originalPosition
+    Color originalColor
+
+    +Borpamon() : Borpamon
+    -Awake() : void
+    +Setup() : void
+    +PlayEnterAnimation() : void
+    +PlayAttackAnimation() : void
+    +PlayHitAnimation() : void
+    +PlayFaintAnimation() : void
+}
+
+Class BattleDialogBox{
+     int lettersPerSecond
+     Color highlightedColor
+     Text dialogText
+     GameObject moveSelector
+     GameObject actionSelector
+     GameObject moveDetails
+     List<Text> actionTexts
+     List<Text> moveTexts
+     Text ppText
+     Text typeText
+
+     +SetDialog(string dialog) : void
+     +TypeDialog(string dialog) : IEnumerator
+     +EnableDialogText(bool enabled) : void
+     +EnableActionSelector(bool enabled) : void
+     +EnableMoveSelector(bool enabled) : void
+     +UpdateActionSelection(int selectedAction) : void
+     +UpdateMoveSelection(int selectedMove, Move move) : void
+     +SetMoveNames(List<Move> moves) : void
+}
+    
+class BattleSystem{
+    +enum BattleState
+    BattleUnit playerUnit
+    BattleHud playerHud
+    BattleUnit enemyUnit
+    BattleHud enemyHud
+    BattleDialogBox dialogBox
+    PartyScreen partyScreen
+    +event Action<bool> OnBattleOver
+    BattleState state
+    int currentAction
+    int currentMove
+    int currentMember
+    BorpamonParty playerParty
+    Borpamon wildBorpamon
+
+    +StartBattle(BorpamonParty playerParty, Borpamon wildBorpamon) : void
+    +SetupBattle() : IEnumerator
+    PlayerAction() : void
+    OpenPartyScreen() : void
+    PlayerMove() : void
+    PerformPlayerMove() : IEnumerator
+    PerformEnemyMove() : IEnumerator
+    ShowDamageDetails(DamageDetails damageDetails) : IEnumerator
+    HandleActionSelection() : void
+    HandleMoveSelection() : void
+    HandlePartySelection() : void
+    +HandleUpdate() : void
+}
+
+class BattleHud
+
+class HPBar
+
+class PartyMemberUI{
+     Text nameText
+     Text levelText
+     HPBar hpBar
+     Image borpamonImage
+     Color highlightedColor
+     Borpamon _borpamon
+
+     +SetData(Borpamon Borpamon) : void
+     +SetSelected(bool selected) : void
+     +ShakeBorpamon() : IEnumerator
+}
+note left: This is where I tried \n to run the animation
+
+class PartyScreen{
+    Text messageText
+    PartyMemberUI[] memberSlots
+    List<Borpamon> borpamons
+
+    +Init() : void
+    +SetPartyData(List<Borpamon> borpamons) : void
+    +UpdateMemberSelection(int selectedMember) : void
+}
+
+Class BorpamonBase{
+    string name
+    string description
+    Sprite frontSprite
+    Sprite backSprite
+    BorpamonType type1
+    BorpamonType type2
+    int maxHp
+    int attack
+    int defense
+    int spAttack
+    int spDefense
+    int speed
+    List<LearnableMove> learnableMoves
+    enum BorpamonType
+
+    +Name() :string
+    +Description() : string
+    +FrontSprite() : Sprite
+    +BackSprite() : Sprite
+    +Type1() : BorpamonType
+    +Type2() : BorpamonType
+    +MaxHp() : int
+    +Attack(): int
+    +Defense() : int 
+    +SpAttack() : int
+    +SpDefense() : int
+    +Speed() : int
+    +List<LearnableMove> LearnableMoves() : List<LearnableMove>
+}
+
+class TypeChart{
+    {static} float[][] chart
+    +{static} GetEffectiveness(BorpamonType attackType, BorpamonType defenseType) : float
+}
+class BorpamonParty{
+    List<Borpamon> borpamons
+
+    +Borpamons() : List<Borpamon>
+    -Start() : void
+
+}
+
+class Borpamon
+
+class Move
+
+class MoveBase
+
+class MapArea
+
+Class PlayerController
+
+
+@enduml

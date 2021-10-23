@@ -233,6 +233,7 @@ MonoBehaviour:
   levelText: {fileID: 2103674019894601020}
   hpBar: {fileID: 4379404470680464031}
   borpamonImage: {fileID: 6674891690943073575}
+  highlightedColor: {r: 0.21176468, g: 0.3455007, b: 0.9607843, a: 1}
 --- !u!1 &2260195032994290300
 GameObject:
   m_ObjectHideFlags: 0

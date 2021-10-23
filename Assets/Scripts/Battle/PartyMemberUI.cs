@@ -2,13 +2,16 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+using DG.Tweening;
 
 public class PartyMemberUI : MonoBehaviour
 {
     [SerializeField] Text nameText;
     [SerializeField] Text levelText;
     [SerializeField] HPBar hpBar;
-    [SerializeField] Image borpamonImage;
+    [SerializeField] Image borpamonImage; 
+    [SerializeField] Color highlightedColor;
+    
 
     Borpamon _borpamon;
     public void SetData(Borpamon borpamon)
@@ -21,8 +24,19 @@ public class PartyMemberUI : MonoBehaviour
         hpBar.SetHP((float)borpamon.HP / borpamon.MaxHp);
     }
 
-    public IEnumerator UpdateHP()
+    public void SetSelected(bool selected)
     {
-        yield return hpBar.SetHPSmooth((float)_borpamon.HP / _borpamon.MaxHp);
+        if (selected)
+        {
+            nameText.color = highlightedColor;
+        }
+        else
+        {
+            nameText.color = Color.black;
+        }
+         
     }
+    
+    
+    
 }

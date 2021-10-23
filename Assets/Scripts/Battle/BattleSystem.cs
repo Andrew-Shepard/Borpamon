@@ -3,21 +3,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum BattleState { Start, PlayerAction, PlayerMove, EnemyMove, Busy }
+public enum BattleState { Start, ActionSelection, MoveSelection, PerformMove, Busy, PartyScreen, BattleOver }
 public class BattleSystem : MonoBehaviour
 {
     [SerializeField] BattleUnit playerUnit;
-    [SerializeField] BattleHud playerHud;
     [SerializeField] BattleUnit enemyUnit;
-    [SerializeField] BattleHud enemyHud;
     [SerializeField] BattleDialogBox dialogBox;
     [SerializeField] PartyScreen partyScreen;
 
     public event Action<bool> OnBattleOver;
+    
 
     BattleState state;
-    int currentAction;
-    int currentMove;
+    int currentAction; //Run / Party / Bag / Fight
+    int currentMove; // Mon moves
+    int currentMember; // Party selection
 
     BorpamonParty playerParty;
     Borpamon wildBorpamon;
@@ -28,28 +28,26 @@ public class BattleSystem : MonoBehaviour
         StartCoroutine(SetupBattle());
     }
 
-   
+
     public IEnumerator SetupBattle()
     {
         playerUnit.Setup(playerParty.GetHealthyBorpamon());
         enemyUnit.Setup(wildBorpamon);
-        playerHud.SetData(playerUnit.Borpamon);
-        enemyHud.SetData(enemyUnit.Borpamon);
 
         partyScreen.Init();
 
         dialogBox.SetMoveNames(playerUnit.Borpamon.Moves);
 
         yield return
-            StartCoroutine( dialogBox.TypeDialog($"A wild {enemyUnit.Borpamon.Base.Name} appeared!") );
+            StartCoroutine(dialogBox.TypeDialog($"A wild {enemyUnit.Borpamon.Base.Name} appeared!"));
         yield return new WaitForSeconds(1f);
 
-        PlayerAction();
+        ActionSelection();
     }
 
-    void PlayerAction()
-    { 
-        state = BattleState.PlayerAction;
+    void ActionSelection()
+    {
+        state = BattleState.ActionSelection;
         dialogBox.SetDialog($"Choose an action");
 
         dialogBox.EnableActionSelector(true);
@@ -57,99 +55,92 @@ public class BattleSystem : MonoBehaviour
 
     void OpenPartyScreen()
     {
+        state = BattleState.PartyScreen;
         partyScreen.SetPartyData(playerParty.Borpamons);
         partyScreen.gameObject.SetActive(true);
     }
 
-    void PlayerMove()
+    void MoveSelection()
     {
-        state = BattleState.PlayerMove;
+        state = BattleState.MoveSelection;
         dialogBox.EnableActionSelector(false);
         dialogBox.EnableDialogText(false);
         dialogBox.EnableMoveSelector(true);
     }
 
-    IEnumerator PerformPlayerMove()
+    IEnumerator PlayerMove()
     {
-        state = BattleState.Busy;
+        state = BattleState.PerformMove;
 
         var move = playerUnit.Borpamon.Moves[currentMove];
+        yield return RunMove(playerUnit, enemyUnit, move);
+
+        if(state == BattleState.PerformMove)
+            StartCoroutine(EnemyMove());
+    }
+
+    IEnumerator EnemyMove()
+    {
+        state = BattleState.PerformMove;
+
+        var move = enemyUnit.Borpamon.GetRandomMove();
+        yield return RunMove(enemyUnit, playerUnit, move);
+        
+        if (state == BattleState.PerformMove)
+            ActionSelection();
+    }
+
+    IEnumerator RunMove(BattleUnit sourceUnit, BattleUnit targetUnit, Move move)
+    {
         --move.Pp;
 
-        yield return dialogBox.TypeDialog($"{playerUnit.Borpamon.Base.Name} used {move.Base.Name}!");
+        yield return dialogBox.TypeDialog($"{sourceUnit.Borpamon.Base.Name} used {move.Base.Name}!");
         yield return new WaitForSeconds(1f);
 
-        playerUnit.PlayAttackAnimation();
+        sourceUnit.PlayAttackAnimation();
         yield return new WaitForSeconds(1f);
 
-        enemyUnit.PlayHitAnimation();
+        targetUnit.PlayHitAnimation();
 
-        DamageDetails damageDetails = enemyUnit.Borpamon.TakeDamage(move, playerUnit.Borpamon);
-        yield return enemyHud.UpdateHP();
+        var damageDetails = targetUnit.Borpamon.TakeDamage(move, sourceUnit.Borpamon);
+        yield return targetUnit.Hud.UpdateHP();
         yield return ShowDamageDetails(damageDetails);
 
         if (damageDetails.Fainted)
         {
             currentMove = 0; //Prevents user from accessing a move that doesnt exist
-            yield return dialogBox.TypeDialog($"Enemy {enemyUnit.Borpamon.Base.Name} Fainted.");
-            enemyUnit.PlayFaintAnimation();
+            yield return dialogBox.TypeDialog($"{targetUnit.Borpamon.Base.Name} Fainted.");
+            targetUnit.PlayFaintAnimation();
 
             yield return new WaitForSeconds(2f);
             OnBattleOver(true);
-        }
-        else
-        {
-            StartCoroutine(EnemyMove());
+
+            CheckForBattleOver(targetUnit);
+
         }
     }
 
-    IEnumerator EnemyMove()
+    void BattleOver(bool won)
     {
-        state = BattleState.EnemyMove;
-
-        var move = enemyUnit.Borpamon.GetRandomMove();
-        --move.Pp;
-
-        yield return dialogBox.TypeDialog($"{enemyUnit.Borpamon.Base.Name} used {move.Base.Name}!");
-        yield return new WaitForSeconds(1f);
-
-        enemyUnit.PlayAttackAnimation();
-        yield return new WaitForSeconds(1f);
-
-        playerUnit.PlayHitAnimation();
-
-        DamageDetails damageDetails = playerUnit.Borpamon.TakeDamage(move, enemyUnit.Borpamon);
-        yield return playerHud.UpdateHP();
-        yield return ShowDamageDetails(damageDetails);
-
-        if (damageDetails.Fainted)
+        state = BattleState.BattleOver;
+        OnBattleOver(won);
+    }
+    void CheckForBattleOver(BattleUnit faintedUnit)
+    {
+        if (faintedUnit.IsPlayerUnit)
         {
-            yield return dialogBox.TypeDialog($"{playerUnit.Borpamon.Base.Name} Fainted.");
-            playerUnit.PlayFaintAnimation();
-
-            yield return new WaitForSeconds(2f);
             var nextBorpamon = playerParty.GetHealthyBorpamon();
             if (nextBorpamon != null)  // if there's a living pokemon in the party
             {
-                playerUnit.Setup(nextBorpamon);
-                playerHud.SetData(nextBorpamon);
-
-                dialogBox.SetMoveNames(playerUnit.Borpamon.Moves);
-
-                yield return dialogBox.TypeDialog($"Go {nextBorpamon.Base.Name}!");
-                yield return new WaitForSeconds(1f);
-
-                PlayerAction();
+                OpenPartyScreen();
             }
             else
             {
-                OnBattleOver(false);
+                BattleOver(false);
             }
         }
         else
-        {
-            PlayerAction();
-        }
+            BattleOver(true);
     }
 
     IEnumerator ShowDamageDetails(DamageDetails damageDetails)
@@ -159,12 +150,12 @@ public class BattleSystem : MonoBehaviour
             yield return dialogBox.TypeDialog("A critical hit!");
             yield return new WaitForSeconds(1f);
         }
-        
+
         if (damageDetails.TypeEffectiveness > 1f)
         {
             yield return dialogBox.TypeDialog("It's super effective!");
             yield return new WaitForSeconds(1f);
-        } 
+        }
         else if (damageDetails.TypeEffectiveness < 1f)
         {
             yield return dialogBox.TypeDialog("It's not very effective.");
@@ -172,7 +163,7 @@ public class BattleSystem : MonoBehaviour
         }
     }
     void HandleActionSelection()
-    {   
+    {
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             currentAction++;
@@ -199,7 +190,7 @@ public class BattleSystem : MonoBehaviour
             if (currentAction == 0)
             {
                 //Fight
-                PlayerMove();
+                MoveSelection();
 
             }
             else if (currentAction == 1)
@@ -225,21 +216,26 @@ public class BattleSystem : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.RightArrow))
         {
             currentMove++;
+            
         }
         else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
             currentMove--;
+            
         }
         else if (Input.GetKeyDown(KeyCode.DownArrow))
         {
             currentMove += 2;
+            
         }
         else if (Input.GetKeyDown(KeyCode.UpArrow))
         {
             currentMove -= 2;
+            
         }
+        
 
-        currentMove = Mathf.Clamp(currentMove, 0, playerUnit.Borpamon.Moves.Count - 1); 
+        currentMove = Mathf.Clamp(currentMove, 0, playerUnit.Borpamon.Moves.Count - 1);
         //Keeps the values within the the am of moves
 
         dialogBox.UpdateMoveSelection(currentMove, playerUnit.Borpamon.Moves[currentMove]);
@@ -248,26 +244,95 @@ public class BattleSystem : MonoBehaviour
         {
             dialogBox.EnableMoveSelector(false);
             dialogBox.EnableDialogText(true);
-            StartCoroutine(PerformPlayerMove());
+            StartCoroutine(PlayerMove());
         }
         if (Input.GetKeyDown(KeyCode.X))
         {
             dialogBox.EnableMoveSelector(false);
             dialogBox.EnableDialogText(true);
-            PlayerAction();
+            ActionSelection();
         }
     }
-    public void HandleUpdate()
+
+    void HandlePartySelection()
     {
-        if(state == BattleState.PlayerAction)
+        if (Input.GetKeyDown(KeyCode.RightArrow))
         {
-            HandleActionSelection();
+            currentMember++;
         }
-        else if (state == BattleState.PlayerMove)
+        else if (Input.GetKeyDown(KeyCode.LeftArrow))
         {
-            HandleMoveSelection();
+            currentMember--;
+        }
+        else if (Input.GetKeyDown(KeyCode.DownArrow))
+        {
+            currentMember += 2;
+        }
+        else if (Input.GetKeyDown(KeyCode.UpArrow))
+        {
+            currentMember -= 2;
+        }
+        
+        currentMove = Mathf.Clamp(currentMember, 0, playerParty.Borpamons.Count - 1);
+        
+        partyScreen.UpdateMemberSelection(currentMember);
+        
+        if (Input.GetKeyDown(KeyCode.Z))
+        {
+            var selectedMember = playerParty.Borpamons[currentMember];
+            if (selectedMember.HP <= 0)
+            {
+                partyScreen.SetMessageText("You can't send out a fainted Borpamon");
+                return;
+            }
+            if (selectedMember == playerUnit.Borpamon)
+            {
+                partyScreen.SetMessageText("You cant switch with the same Borpamon");
+                return;
+            }
+
+            partyScreen.gameObject.SetActive(false);
+            state = BattleState.Busy;
+            StartCoroutine(SwitchBorpamon(selectedMember));
+        }
+        else if (Input.GetKeyDown(KeyCode.X))
+        {
+            partyScreen.gameObject.SetActive(false);
+            ActionSelection();
         }
     }
     
+    IEnumerator SwitchBorpamon(Borpamon newBorpamon)
+    {
+        if (playerUnit.Borpamon.HP > 0)
+        {
+            yield return dialogBox.TypeDialog($"Come back {playerUnit.Borpamon.Base.Name}!");
+            playerUnit.PlayFaintAnimation();
+            yield return new WaitForSeconds(2f);
+        }
 
+        playerUnit.Setup(newBorpamon);
+        dialogBox.SetMoveNames(playerUnit.Borpamon.Moves);
+
+        yield return dialogBox.TypeDialog($"Go {newBorpamon.Base.Name}!");
+        yield return new WaitForSeconds(1f);
+
+        StartCoroutine(EnemyMove());
+    }
+
+    public void HandleUpdate()
+    {
+        if (state == BattleState.ActionSelection)
+        {
+            HandleActionSelection();
+        }
+        else if (state == BattleState.MoveSelection)
+        {
+            HandleMoveSelection();
+        }
+        else if (state == BattleState.PartyScreen)
+        {
+            HandlePartySelection();
+        }
+    }
 }
