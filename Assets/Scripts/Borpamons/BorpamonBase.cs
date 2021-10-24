@@ -67,7 +67,7 @@ public class BorpamonBase : ScriptableObject
     }
     public int SpAttack
     {
-        get { return SpAttack; }
+        get { return spAttack; }
     }
     public int SpDefense
     {
@@ -120,6 +120,10 @@ public enum BorpamonType
     Fairy
 }
 
+public enum Stat
+{
+    Attack, Defense, SpAttack, SpDefense, Speed
+}
 public class TypeChart
 {
     static float[][] chart =
